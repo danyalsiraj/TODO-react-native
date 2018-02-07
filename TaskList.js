@@ -33,7 +33,9 @@ export default class TaskList extends Component{
   }
   renderRow(todo){
     return(
-      <TaskRow todo={todo}/>
+      <TaskRow
+      todo={todo}
+      deleteTask={this.deleteTask.bind(this)}/>
     )
   }
 
@@ -43,20 +45,17 @@ export default class TaskList extends Component{
     });
   }
 
-  // componentWillRecieveProps(nextProps) {
-  //   this.setState({
-  //     dataSource,
-  //     todos: nextProps.todos
-  //   })
-  // }
+
   addTask(newTask){
     this.state.todos.push({task: newTask})
     this.state.dataSource = this.state.dataSource.cloneWithRows(this.state.todos)
 
     this.setState(this.state)
   }
-  deleyeTask(deleteTask){
+  deleteTask(deleteTask){
     this.state.todos.splice(this.state.todos.indexOf(deleteTask),1)
+    this.state.dataSource=this.state.dataSource.cloneWithRows(this.state.todos)
+    this.setState(this.state)
   }
   render(){
     return(
@@ -91,7 +90,6 @@ const styles=StyleSheet.create({
     backgroundColor:'#333',
     justifyContent:'center',
     alignItems:'center'
-
   },
   buttonText:{
     color:'white',
