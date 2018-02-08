@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import TaskRow from './TaskRow'
+import TaskRow from './TaskRow/Component'
 
 import {
   Text,
@@ -39,6 +39,12 @@ export default class TaskList extends Component{
     )
   }
 
+  deleteTask(deleteTask){
+    this.state.todos.splice(this.state.todos.indexOf(deleteTask),1)
+    this.state.dataSource=this.state.dataSource.cloneWithRows(this.state.todos)
+    this.setState(this.state)
+  }
+
   onAddStarted(){
     this.props.navigation.navigate('TaskForm',{
       addTask: this.addTask.bind(this)
@@ -52,11 +58,7 @@ export default class TaskList extends Component{
 
     this.setState(this.state)
   }
-  deleteTask(deleteTask){
-    this.state.todos.splice(this.state.todos.indexOf(deleteTask),1)
-    this.state.dataSource=this.state.dataSource.cloneWithRows(this.state.todos)
-    this.setState(this.state)
-  }
+
   render(){
     return(
       <View style={styles.container}>

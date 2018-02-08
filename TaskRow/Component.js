@@ -2,30 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  Text,
-  StyleSheet,
-  View,
-  TouchableHighlight,
-  ListView
-} from 'react-native';
+//   Text,
+   StyleSheet
+//   View,
+//   TouchableHighlight,
+//   ListView
+ } from 'react-native';
 
+import Render from'./Render';//no need to add .iso or .android. it looks for that based on platform
 export default class TaskRow extends Component{
   render(){
-    return(
-      <View style={styles.container}>
-        <Text style={styles.label}>{this.props.todo.task}</Text>
-
-        <TouchableHighlight
-        style={styles.doneButton}
-        onPress={this.deleteTask.bind(this)}>
-          <Text>DONE!</Text>
-        </TouchableHighlight>
-      </View>
-    )
+    return Render.call(this,styles)
   }
-  deleteTask(){
-    this.props.deleteTask(this.props.todo)
-  }
+  
 }
 
 TaskRow.propTypes={
