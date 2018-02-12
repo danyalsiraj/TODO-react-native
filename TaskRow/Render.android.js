@@ -22,6 +22,7 @@ export default function render(baseStyles){
   })
 
   function handleDelete(){
+    console.log('Deleting')
     Animated.spring(doneAnimation,{
       tension:2,
       friction:3,
@@ -40,7 +41,7 @@ export default function render(baseStyles){
       style={[baseStyles.container,localStyle.row]}
     >
       <Text style={baseStyles.label}>
-        and: {this.props.todo.task}
+        {this.props.todo.task}
       </Text>
 
       <TouchableHighlight

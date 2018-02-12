@@ -10,6 +10,8 @@ import {StackNavigator} from 'react-navigation'
 
 import TaskList from './TaskList';
 import TaskForm from './TaskForm';
+import store from './TodoStore';
+import {Provider} from 'react-redux'
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -36,7 +38,10 @@ export default class App extends Component<{}> {
 
 
   render() {
-    return (<RootStack/>);
+    return (
+      <Provider store={store}>
+        <RootStack/>
+      </Provider>);
   }
 //   renderScene(route,nav){
 //     switch(route.name){

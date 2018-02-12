@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import TaskRow from './TaskRow/Component'
+import TaskRow from './TaskRow/Component';
+// import store from './TodoStore';
+import {connect} from 'react-redux'
+
 
 import {
   Text,
@@ -10,26 +13,41 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-export default class TaskList extends Component{
+
+function mapStatetoProps(state) {
+  return ({
+    todos: state.todos
+  })
+}
+function mapDispatchToProps(dispatch){
+  return {
+    addTodo: (todo)=>{
+      dispatch({
+        type:'ADD_TODO',
+        todo: todo
+      })
+    },
+    deleteTodo: (todo)=>{
+      dispatch({
+        type:'DELETE_TODO',
+        todo:todo
+      })
+    }
+  }
+}
+const ds =new ListView.DataSource({
+  rowHasChanged:(r1,r2)=>r1 !== r2
+})
+class TaskList extends Component{
   constructor(props,context){
     super(props,context)
-    this.state={
-      todos:[
-        {
-          task:'First todo',
-        },
-        {
-          task:'Second todo',
-        },
-        {
-          task:'Third todo',
-        }
-      ]
-    };
-    const ds =new ListView.DataSource({
-      rowHasChanged:(r1,r2)=>r1 !== r2
-    })
-    this.state.dataSource = ds.cloneWithRows(this.state.todos);
+
+    this.dataSource = ds.cloneWithRows(this.props.todos);
+
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.dataSource = ds.cloneWithRows(nextProps.todos);
   }
   renderRow(todo){
     return(
@@ -40,9 +58,8 @@ export default class TaskList extends Component{
   }
 
   deleteTask(deleteTask){
-    this.state.todos.splice(this.state.todos.indexOf(deleteTask),1)
-    this.state.dataSource=this.state.dataSource.cloneWithRows(this.state.todos)
-    this.setState(this.state)
+    this.props.deleteTodo(deleteTask)
+
   }
 
   onAddStarted(){
@@ -53,18 +70,22 @@ export default class TaskList extends Component{
 
 
   addTask(newTask){
-    this.state.todos.push({task: newTask})
-    this.state.dataSource = this.state.dataSource.cloneWithRows(this.state.todos)
-
-    this.setState(this.state)
+    //this.state.todos.push({task: newTask})
+    //this.state.dataSource = this.state.dataSource.cloneWithRows(this.state.todos)
+    //this.setState(this.state)
+    // store.dispatch({
+    //   type:'ADD_TODO',
+    //   task:newTask
+    // })
+    this.props.addTodo(newTask)
   }
 
   render(){
     return(
       <View style={styles.container}>
         <ListView
-          key={this.state.todos}//this is a fake property
-          dataSource={this.state.dataSource}
+          key={this.props.todos}//this is a fake property
+          dataSource={this.dataSource}
           renderRow={this.renderRow.bind(this)}
         />
         <TouchableHighlight
@@ -78,6 +99,8 @@ export default class TaskList extends Component{
 }
 TaskList.propTypes={
 }
+
+
 const styles=StyleSheet.create({
   container:{
     flex:1,
@@ -101,4 +124,5 @@ const styles=StyleSheet.create({
 
   }
 })
+export default connect(mapStatetoProps,mapDispatchToProps)(TaskList);
 //export default TaskList; //we can do this when we create the class
