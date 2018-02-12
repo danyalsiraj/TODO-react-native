@@ -11,6 +11,8 @@ import {StackNavigator} from 'react-navigation'
 import TaskList from './TaskList';
 import TaskForm from './TaskForm';
 import store from './TodoStore';
+import Login from './Login'
+import SignUp from './SignUp'
 import {Provider} from 'react-redux'
 
 const instructions = Platform.select({
@@ -20,6 +22,12 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 const RootStack = StackNavigator({
+  Login:{
+    screen:Login
+  },
+  SignUp:{
+    screen:SignUp
+  },
   Home: {
     screen: TaskList
   },
@@ -27,7 +35,7 @@ const RootStack = StackNavigator({
     screen: TaskForm
   }
 }, {
-  initialRouteName: 'Home',
+  initialRouteName: 'Login',
   headerMode: 'none'
 })
 export default class App extends Component<{}> {
