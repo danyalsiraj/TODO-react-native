@@ -1,4 +1,4 @@
-import {createStore,applyMiddleware} from 'redux'
+import {createStore,applyMiddleware,combineReducers} from 'redux'
 import {createLogger} from 'redux-logger'
 const defaultState={
   todos:[
@@ -10,8 +10,16 @@ const defaultState={
     }
   ]
 }
+const defaultUserState={
+  name:'',email:'',
+  password:'',
+  authToken:'',
+  loggedIn:false,
+  isFetching:false,
+  errors:[]
+}
 
-function todoStore(state=defaultState,action){
+function todoReducer(state=defaultState,action){
   switch (action.type) {
     case 'ADD_TODO':
       let newState = {...state, todos: [...state.todos, { task: action.todo }]}
@@ -25,5 +33,23 @@ function todoStore(state=defaultState,action){
 
   }
 }
+function userReducer(state=defaultUserState,action){
+  switch(action.type){
+    case 'FETCHING_USER':
+      return {...state,isFetching:true, email:action.email, password:action.password}
+    case 'FETCHING_USER_ERROR':
+      return {...state,isFetching:false,errors: state.errors.concat(action.errors)}
+    case 'FETCHED_USER':
+    return {...state,authToken:action.authToken,isFetching:false,loggedIn:true,errors:[]}
+    case 'LOGOUT':
+      return defaultUserState
+    default:
+      return state
+  }
+}
 
-export default createStore(todoStore,applyMiddleware(createLogger()))
+const reducer=combineReducers({
+  user: userReducer,
+  todos:todoReducer
+})
+export default createStore(reducer,applyMiddleware(createLogger()))

@@ -16,7 +16,7 @@ import {
 
 function mapStatetoProps(state) {
   return ({
-    todos: state.todos
+    todos: state.todos.todos
   })
 }
 function mapDispatchToProps(dispatch){
@@ -70,14 +70,7 @@ class TaskList extends Component{
 
 
   addTask(newTask){
-    //this.state.todos.push({task: newTask})
-    //this.state.dataSource = this.state.dataSource.cloneWithRows(this.state.todos)
-    //this.setState(this.state)
-    // store.dispatch({
-    //   type:'ADD_TODO',
-    //   task:newTask
-    // })
-    this.props.addTodo(newTask)
+      this.props.addTodo(newTask)
   }
 
   render(){

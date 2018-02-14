@@ -7,13 +7,42 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-export default class Login extends Component{
+import {connect} from 'react-redux'
+import api from'./api'
+
+function mapStatetoProps(state) {
+  return ({
+    user: state.user
+  })
+}
+function mapDispatchToProps(dispatch){
+  return {
+    login: (email,password)=>{
+      dispatch({
+        type:'FETCHING_USER',
+        email: email,
+        password:password
+      })
+    },
+    loggedInSuccess:(authToken)=>{
+      dispatch({
+        type:'FETCHED_USER',
+        authToken: authToken
+      })
+    },
+    loginDenied:(errors)=>{
+      dispatch({
+        type:'FETCHING_USER_ERROR',
+        errors:errors
+      })
+    }
+  }
+}
+
+class Login extends Component{
   constructor(props,context){
     super(props,context)
-    this.state={
-      username:'',
-      password:''
-    }
+
   }
   storeUsername(username){
     this.username=username
@@ -22,13 +51,16 @@ export default class Login extends Component{
     this.password=password
   }
   login(){
-    if(!this.authLogin(this)){
-
-    }
-    this.props.navigation.navigate('Home')
-  }
-  authLogin(){
-    return true
+    this.props.login(this.username,this.password)
+    api.login(this.username,this.password)
+      .then(response=>{
+        if(response.status==200){
+          this.props.loggedInSuccess(response.headers['x-auth'])
+          this.props.navigation.navigate('Home')
+        } else {
+          this.props.loginDenied(['Wrong username or password'])
+        }
+      })
   }
   signUp(){
     this.props.navigation.navigate('SignUp')
@@ -53,7 +85,7 @@ export default class Login extends Component{
           />
         <TouchableHighlight
           style={styles.button}
-          onPress={this.login.bind(this)}
+          onPress={this.props.user.isFetching ? null : this.login.bind(this)}
           >
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableHighlight>
@@ -94,3 +126,4 @@ const styles=StyleSheet.create({
     backgroundColor:'red'
   }
 })
+export default connect(mapStatetoProps,mapDispatchToProps)(Login);
