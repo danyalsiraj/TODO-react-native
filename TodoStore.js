@@ -8,29 +8,62 @@ const defaultState={
     {
       task:'second task'
     }
-  ]
+  ],
+  fetched:false,
+  isFetching:true,
+  errors:[]
 }
 const defaultUserState={
-  name:'',email:'',
+  name:'',
+  email:'',
   password:'',
   authToken:'',
   loggedIn:false,
   isFetching:false,
   errors:[]
 }
+const defaultTodo={
+  task:'',
+  id:'',
+  isAdding:false,
+  added:false,
+  isDeleting:false,
+  deleted:false,
+  errors:[]
+}
 
-function todoReducer(state=defaultState,action){
+function todosReducer(state=defaultState,action){
   switch (action.type) {
-    case 'ADD_TODO':
-      let newState = {...state, todos: [...state.todos, { task: action.todo }]}
-      return newState
-    case 'DELETE_TODO':
-      return Object.assign({},state,{
-        todos: state.todos.filter(todo =>  todo.task !== action.todo.task )
-      })
+    case 'FETCHING_TODOS':
+      return {...state,isFetching:true}
+    case 'FETCHING_TODOS_ERRORS':
+      return {...state,isFetching:false,fetched:false,errors:state.errors.concat(action.errors)}
+    case 'FETCHED_TODOS':
+      return {...state,isFetching:false,fetched:true,todos:action.todos}
+    case 'ADDED_TODO':
+      return {...state,todos:state.todos.concat([{id: action.id, task: action.task}])}
     default:
       return state
 
+  }
+}
+function todoReducer(state=defaultTodo,action){
+  switch (action.type) {
+  case 'ADDING_TODO':
+    return {...state,isAdding:true, task:action.task,added:false}
+  case 'ADDED_TODO':
+      return {...state, added:true,isAdding:false}
+  case 'ADDING_TODO_ERROR':
+      return {...state,errors:state.errors.concat(action.errors),isAdding:false,added:false}
+
+  case 'DELETING_TODO':
+    return {...state,isDeleting:true,id:action.id,deleted:false}
+  case 'DELETED_TODO':
+    return {...state,isDeleting:false,deleted:true}
+  case 'DELETING_TODO_ERROR':
+    return {...state,errors:state.errors.concat(action.errors),isDeleting:false,deleted:false}
+  default:
+    return state
   }
 }
 function userReducer(state=defaultUserState,action){
@@ -50,6 +83,7 @@ function userReducer(state=defaultUserState,action){
 
 const reducer=combineReducers({
   user: userReducer,
-  todos:todoReducer
+  todos:todosReducer,
+  todo: todoReducer
 })
 export default createStore(reducer,applyMiddleware(createLogger()))

@@ -6,20 +6,62 @@ import {
   View,
   TouchableHighlight
 } from 'react-native';
+import {connect} from 'react-redux'
 
-export default class TaskRow extends Component{
+import api from'./api'
+
+function mapStatetoProps(state) {
+  return ({
+    todo: state.todo,
+    authToken:state.user.authToken
+  })
+}
+function mapDispatchToProps(dispatch){
+  return {
+    addTodo:(task)=>{
+      dispatch({
+        type:'ADDING_TODO',
+        task:task
+      })
+    },
+    addTodoSuccess:(task)=>{
+      dispatch({
+        type:'ADDED_TODO',
+        task:task.text,
+        id:task._id
+      })
+    },
+    addingTodoErrors:(errors)=>{
+      dispatch({
+        type:'ADDING_TODO_ERRORS',
+        errors: errors
+      })
+    },
+  }
+}
+
+class TaskForm extends Component{
   constructor(props,context){
     super(props,context)
-    this.state={
-      task:''
-    }
+    // this.state={
+    //   todo:''
+    // }
   }
   storeTask(newTask){
-    this.task = newTask
+    this.todo = newTask
   }
   addTask(){
-    this.props.navigation.state.params.addTask(this.task)
-    this.props.navigation.goBack();
+    this.props.addTodo(this.todo)
+    api.addTodo(this.todo,this.props.authToken)
+      .then(body=>{
+        if(body && body.todo){
+          this.props.addTodoSuccess(body.todo)
+          this.props.navigation.goBack();
+        }else{
+          this.props.addingTodoErrors('unable to add todo');
+        }
+      })
+    //this.props.navigation.state.params.addTask(this.todo)
   }
   render(){
     return(
@@ -72,3 +114,5 @@ const styles=StyleSheet.create({
     backgroundColor:'red'
   }
 })
+
+export default connect(mapStatetoProps,mapDispatchToProps)(TaskForm);

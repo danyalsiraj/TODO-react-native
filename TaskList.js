@@ -13,14 +13,34 @@ import {
   TouchableHighlight
 } from 'react-native';
 
+import api from'./api'
+
 
 function mapStatetoProps(state) {
   return ({
-    todos: state.todos.todos
+    todos: state.todos.todos,
+    authToken:state.user.authToken
   })
 }
 function mapDispatchToProps(dispatch){
   return {
+    fetchTodos:()=>{
+      dispatch({
+        type:'FETCHING_TODOS'
+      })
+    },
+    fetchTodoSuccess:(todos)=>{
+      dispatch({
+        type:'FETCHED_TODOS',
+        todos: todos
+      })
+    },
+    fetchTodosErrors:(errors)=>{
+      dispatch({
+        type:'FETCHING_TODOS_ERRORS',
+        errors: errors
+      })
+    },
     addTodo: (todo)=>{
       dispatch({
         type:'ADD_TODO',
@@ -29,8 +49,19 @@ function mapDispatchToProps(dispatch){
     },
     deleteTodo: (todo)=>{
       dispatch({
-        type:'DELETE_TODO',
-        todo:todo
+        type:'DELETING_TODO',
+        id :todo.id
+      })
+    },
+    deleteTodoSuccess:()=>{
+      dispatch({
+        type:'DELETED_TODO'
+      })
+    },
+    deleTodoError: (error)=>{
+      dispatch({
+        type:'DELETING_TODO_ERROR',
+        errors: error
       })
     }
   }
@@ -39,11 +70,27 @@ const ds =new ListView.DataSource({
   rowHasChanged:(r1,r2)=>r1 !== r2
 })
 class TaskList extends Component{
+
   constructor(props,context){
     super(props,context)
-
+    this.getTodos()
     this.dataSource = ds.cloneWithRows(this.props.todos);
-
+  }
+  getTodos(){
+    if (!this.props.todos.isFetching){
+      this.props.fetchTodos()
+      api.getTodos(this.props.authToken)
+        .then(body=>{
+          if(body && body.todos){
+            let todos = body.todos.map(todo=>{
+              return {id:todo._id, task:todo.text}
+            })
+            this.props.fetchTodoSuccess(todos)
+          }else{
+            this.props.fetchTodosErrors(['Unable to get Todos'])
+          }
+        })
+    }
   }
 
   componentWillReceiveProps(nextProps){
@@ -59,7 +106,15 @@ class TaskList extends Component{
 
   deleteTask(deleteTask){
     this.props.deleteTodo(deleteTask)
-
+    api.deleteTodo(deleteTask.id,this.props.authToken)
+      .then(response=>{
+        if(response.status==200){
+          this.props.deleteTodoSuccess()
+          this.getTodos();
+        }else{
+          this.props.deleTodoError('unable to delete')
+        }
+      })
   }
 
   onAddStarted(){

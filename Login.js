@@ -42,6 +42,8 @@ function mapDispatchToProps(dispatch){
 class Login extends Component{
   constructor(props,context){
     super(props,context)
+    this.username='dany@gmail.com'
+    this.password='password'
 
   }
   storeUsername(username){
@@ -55,7 +57,7 @@ class Login extends Component{
     api.login(this.username,this.password)
       .then(response=>{
         if(response.status==200){
-          this.props.loggedInSuccess(response.headers['x-auth'])
+          this.props.loggedInSuccess(response.headers.map['x-auth'])
           this.props.navigation.navigate('Home')
         } else {
           this.props.loginDenied(['Wrong username or password'])
