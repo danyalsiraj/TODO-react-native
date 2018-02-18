@@ -20,6 +20,8 @@ const defaultUserState={
   authToken:'',
   loggedIn:false,
   isFetching:false,
+  isSigningUp:false,
+  signedUp:false,
   errors:[]
 }
 const defaultTodo={
@@ -68,6 +70,13 @@ function todoReducer(state=defaultTodo,action){
 }
 function userReducer(state=defaultUserState,action){
   switch(action.type){
+    case 'SIGNING_UP':
+      return{...state,isSigningUp:true,email:action.email,password:action.password}
+    case 'SIGNED_UP':
+      return{...state,isSigningUp:false,signedUp:true}
+    case 'SIGN_UP_ERRORS':
+      return{...state,errors:state.errors.concat(action.errors),signedUp:false,isSigningUp:false}
+
     case 'FETCHING_USER':
       return {...state,isFetching:true, email:action.email, password:action.password}
     case 'FETCHING_USER_ERROR':

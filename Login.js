@@ -42,8 +42,8 @@ function mapDispatchToProps(dispatch){
 class Login extends Component{
   constructor(props,context){
     super(props,context)
-    this.username='dany@gmail.com'
-    this.password='password'
+    // this.username='Aaa@gmail.com'
+    // this.password='Danyal100'
 
   }
   storeUsername(username){

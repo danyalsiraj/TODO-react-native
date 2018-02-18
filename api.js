@@ -83,8 +83,31 @@ function deleteTodo(id,authToken){
     return {};
   })
 }
+function signUp(email,password){
+  return fetch(`${domainName}/users`
+    ,{
+      method:'POST',
+      headers: {
+        'Content-Type' : 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        password:password
+      })
+    }
+  ).then(res=>{
+    console.log(res);
+    return res
+  })
+  .catch(err => {
+    console.log('Failed signup')
+    console.log(err)
+    return {};
+  })
+}
 module.exports={
   login,
+  signUp,
   getTodos,
   addTodo,
   deleteTodo

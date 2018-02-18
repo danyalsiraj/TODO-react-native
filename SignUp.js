@@ -6,18 +6,45 @@ import {
   View,
   TouchableHighlight
 } from 'react-native';
+import {connect} from 'react-redux'
+import api from'./api'
 
-export default class Login extends Component{
+function mapStatetoProps(state) {
+  return ({
+    email: state.email,
+    password:state.password,
+    passwordConfirmation: state.passwordConfirmation
+  })
+}
+function mapDispatchToProps(dispatch){
+  return {
+    signUp:(email,password)=>{
+      dispatch({
+        type:'SIGNING_UP',
+        email:email,
+        password:password
+      })
+    },
+    signUpSuccessful:()=>{
+      dispatch({
+        type:'SIGNED_UP'
+      })
+    },
+    signUpFailed:(error)=>{
+      dispatch({
+        type:'SIGN_UP_ERRORS',
+        errors:error
+      })
+    }
+}
+}
+class SignUp extends Component{
   constructor(props,context){
     super(props,context)
-    this.state={
-      email:'',
-      password:'',
-      passwordConfirmation:''
-    }
+
   }
   storeEmail(username){
-    this.username=username
+    this.email=username
   }
   storePassword(password){
     this.password=password
@@ -26,6 +53,20 @@ export default class Login extends Component{
     this.passwordConfirmation=passwordConfirmation
   }
   signUp(){
+    this.props.signUp(this.email,this.password)
+    if(this.password==this.passwordConfirmation){
+      api.signUp(this.email,this.password)
+        .then(response=>{
+          if(response.status=200){
+            this.props.signUpSuccessful()
+            this.props.navigation.goBack();
+          }else{
+            this.props.signUpFailed(['unable to signup'])
+          }
+        })
+    }else{
+      this.props.signUpFailed(['Passwords do not match'])
+    }
     <Text>SIGNUP happening</Text>
   }
 
@@ -89,3 +130,5 @@ const styles=StyleSheet.create({
     backgroundColor:'red'
   }
 })
+
+export default connect(mapStatetoProps,mapDispatchToProps)(SignUp);
