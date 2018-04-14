@@ -57,7 +57,7 @@ class SignUp extends Component{
     if(this.password==this.passwordConfirmation){
       api.signUp(this.email,this.password)
         .then(response=>{
-          if(response.status=200){
+          if(response.status==200){
             this.props.signUpSuccessful()
             this.props.navigation.goBack();
           }else{
